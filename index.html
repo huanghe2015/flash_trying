@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>我的动画试验场</title>
+		<style>
+			#app-download-section {
+				width: 80px;
+				height: 80px;
+				background-image: url(img/app-download.png);
+			}
+
+			/*#app-download-section:hover{
+				background-position-x: -800px;
+			}*/
+		</style>
+	</head>
+	<body>
+		<div>
+			<!--
+        	作者：AK88103
+        	时间：2018-10-23
+        	描述：仿下载APP图标动画，纯JS。
+        -->
+			<section id="app-download-section"></section>
+			<script>
+				let app_icon = {
+					//记录帧的范围
+					beginPos: 0,
+					firstSectionBeginCount: 0,
+					firstSectionEndCount: 10,
+					secondSectionBeginCount: 11,
+					secondSectionEndCount: 15,
+					//偏移单位，按图片尺寸计算
+					moveOffset: 80,
+					//定时时间（按毫秒计算）
+					intervalPerFrame: 100,
+					currentFrame: 1,
+					output: function() {
+						return this.beginPos - this.currentFrame * this.moveOffset;
+					},
+					moveIn: function() {
+						/*鼠标放进去的图片运动逻辑*/
+						this.currentFrame++;
+						//如果帧数超出范围，则切回到第二段的第一帧
+						if (this.currentFrame === (this.secondSectionEndCount + 1)) {
+							this.currentFrame = this.secondSectionBeginCount;
+						}
+						console.log(this.currentFrame);
+						return this.output();
+					},
+					moveOut: function() {
+						/*鼠标拿出来的图片运动逻辑*/
+						this.currentFrame--;
+						//如果已经在
+						if (this.currentFrame < this.firstSectionBeginCount) {
+							this.currentFrame = this.firstSectionBeginCount;
+						}
+						console.log(this.currentFrame);
+						return this.output();
+					},
+				};
+				let app_download_section = document.getElementById('app-download-section');
+				//设置位置
+				function setPos(currentPos) {
+					app_download_section.style.backgroundPositionX = `${currentPos}px`;
+				}
+				//定时函数
+				let currentPos;
+
+				function moveInInterval() {
+					//初始化位置（ES6模板字符串）
+					currentPos = app_icon.moveIn();
+					setPos(currentPos);
+				}
+
+				function moveOutInterval() {
+					currentPos = app_icon.moveOut();
+					setPos(currentPos);
+				}
+				//初始化定时器对象,方便追踪处理
+				let moveInTimer, moveOutTimer;
+				//绑定事件
+				app_download_section.addEventListener('mouseover', function() {
+					clearInterval(moveOutTimer);
+					moveInTimer = setInterval(moveInInterval, app_icon.intervalPerFrame);
+
+				});
+				app_download_section.addEventListener('mouseleave', function() {
+					//解除定时器
+					clearInterval(moveInTimer);
+					//逐步回退
+					moveOutTimer = setInterval(moveOutInterval, app_icon.intervalPerFrame);
+					//回退完成就解除定时器
+					setTimeout(function() {
+						clearInterval(moveOutTimer);
+					}, 2000);
+
+
+
+
+
+				});
+			</script>
+		</div>
+	</body>
+</html>
